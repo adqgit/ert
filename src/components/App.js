@@ -13,8 +13,12 @@ import {
   BarChartOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
+// import { Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+
 import CurrencyConverter from "./CurrencyConverter";
 import Ert from "./Ert";
+import EUR from "./EUR";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -22,19 +26,34 @@ const { SubMenu } = Menu;
 function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [ert, setErt] = useState("", []);
+
   // const [value, onChange] = useState(new Date());
 
   useEffect(() => {
     console.log("uruchomienie useEffect");
     if (ert === "") {
-      console.log("uruchomienie if");
-      const url = `http://api.nbp.pl/api/exchangerates/tables/A/?format=json`;
+      console.log("ert - uruchomienie if");
+      const url = `https://api.nbp.pl/api/exchangerates/tables/a/last/5/`;
+
       fetch(url)
+        .then((response) => {
+          if (response.ok) {
+            return response;
+          }
+          throw Error(response.statusText);
+        })
         .then((response) => response.json())
         .then((data) => {
           setErt(data);
         })
-        .catch((e) => console.log("Connection error", e));
+        .catch((error) => console.log(error, "Ooops coś poszło nie tak..."));
+
+      // fetch(url)
+      //   .then((response) => response.json())
+      //   .then((data) => {
+      //     setErt(data);
+      //   })
+      //   .catch((e) => console.log("Connection error", e));
     }
   });
 
@@ -44,8 +63,18 @@ function App() {
       <Layout style={{ minHeight: "100vh" }}>
         <Sider
           collapsible
-          collapsed={collapsed}
+          collapsed={!collapsed}
           onCollapse={() => setCollapsed((prev) => !prev)}
+          // collapsedWidth={0}
+          zeroWidthTriggerStyle={{
+            height: "50px",
+            "border-top-right-radius": "10px",
+            "border-bottom-right-radius": "10px",
+            top: "90vh",
+            "background-color": "#001529",
+            position: "-webkit-sticky",
+          }}
+          // style={{ position: "absolute", height: "100vh", "z-index": "200" }}
         >
           <div className="logo">
             <NavLink to="/">
@@ -72,7 +101,9 @@ function App() {
               icon={<DollarOutlined style={{ fontSize: "20px" }} />}
               title="Waluty"
             >
-              <Menu.Item key="3">EUR</Menu.Item>
+              <Menu.Item key="3">
+                <NavLink to="/EUR"> EUR </NavLink>
+              </Menu.Item>
               <Menu.Item key="4">USD</Menu.Item>
               <Menu.Item key="5">GBP</Menu.Item>
             </SubMenu>
@@ -100,8 +131,16 @@ function App() {
               className="site-layout-background"
               style={{ padding: 24, minHeight: 360 }}
             >
-              <Route exact path="/" render={() => <Ert ert={ert} />} />
-              <Route path="/CurrencyConverter" component={CurrencyConverter} />
+              {ert === "" ? (
+                <LoadingOutlined style={{ fontSize: 24 }} spin />
+              ) : (
+                <Route exact path="/" render={() => <Ert ert={ert} />} />
+              )}
+              <Route
+                path="/CurrencyConverter"
+                render={() => <CurrencyConverter ert={ert} />}
+              />
+              <Route path="/EUR" component={EUR} />
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>

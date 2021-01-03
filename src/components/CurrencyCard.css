@@ -1,0 +1,12 @@
+.last5 > div {
+  position: relative;
+  max-width: 20%;
+  /* margin-bottom: 2%; */
+  float: left;
+  margin-left: 10px;
+  margin-bottom: 0;
+}
+
+.card > p {
+  text-transform: uppercase;
+}

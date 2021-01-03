@@ -1,9 +1,6 @@
 @import "~antd/dist/antd.css";
 
 .logo {
-  /* height: 32px; */
-  /* margin: 16px; */
-  /* background: rgba(255, 255, 255, 0.3); */
   background: #1890ff !important;
 }
 .ert {
@@ -16,11 +13,6 @@
   transition: 1s;
   color: white;
 }
-/* .ert:hover {
-  transition: 1s;
-  color: rgb(30, 235, 30);
-  cursor: help;
-} */
 
 .site-layout .site-layout-background {
   background: #fff;
