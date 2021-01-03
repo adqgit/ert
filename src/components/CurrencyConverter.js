@@ -38,7 +38,19 @@ const CurrencyConverter = (props) => {
   const [calculatedCurrency, setCalculatedCurrency] = useState("", []);
   const [calculatedDate, setCalculatedDay] = useState("", []);
 
-  // let currencies = [];
+  const currencies = [
+    "EUR",
+    "GBP",
+    "SEK",
+    "AUD",
+    "HUF",
+    "RUB",
+    "NOK",
+    "CZK",
+    "DKK",
+    "CHF",
+    "JPY",
+  ];
   const [form] = Form.useForm();
 
   function warningAmount() {
@@ -73,7 +85,8 @@ const CurrencyConverter = (props) => {
     }
     if (
       !!values.kwota.match(
-        /(?=.)^\$?(([1-9][0-9]{0,20}(,[0-9]{3})*)|0)?(,[0-9]{1,2})?$/
+        /^[0-9]+(\.[0-9]{1,2})?$/
+        // /(?=.)^\$?(([1-9][0-9]{0,20}(,[0-9]{3})*)|0)?(.[0-9]{1,2})?$/
       )
     ) {
       amount = values.kwota;
@@ -83,7 +96,7 @@ const CurrencyConverter = (props) => {
     selectedCurrency = values.waluta;
 
     if (amount) {
-      const url = `http://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${selectedDateMinusOneDay}/?format=json`;
+      const url = `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${selectedDateMinusOneDay}/?format=json`;
       fetch(url)
         .then((response) => {
           console.log(
@@ -116,7 +129,7 @@ const CurrencyConverter = (props) => {
           console.log("Nowa data to: ", dateMinusTwoDays);
 
           fetch(
-            `http://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusTwoDays}/?format=json`
+            `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusTwoDays}/?format=json`
           )
             .then((response) => {
               if (response.ok) {
@@ -144,7 +157,7 @@ const CurrencyConverter = (props) => {
               console.log("Nowa data to: ", dateMinusThreeDays);
 
               fetch(
-                `http://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusThreeDays}/?format=json`
+                `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusThreeDays}/?format=json`
               )
                 .then((response) => {
                   if (response.ok) {
@@ -172,7 +185,7 @@ const CurrencyConverter = (props) => {
                   console.log("Nowa data to: ", dateMinusFourDays);
 
                   fetch(
-                    `http://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusFourDays}/?format=json`
+                    `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusFourDays}/?format=json`
                   )
                     .then((response) => {
                       if (response.ok) {
@@ -205,7 +218,7 @@ const CurrencyConverter = (props) => {
                       console.log("Nowa data to: ", dateMinusFiveDays);
 
                       fetch(
-                        `http://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusFiveDays}/?format=json`
+                        `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusFiveDays}/?format=json`
                       )
                         .then((response) => {
                           if (response.ok) {
@@ -239,7 +252,12 @@ const CurrencyConverter = (props) => {
 
   const onReset = () => {
     form.resetFields();
+    setCalculationResult("");
   };
+
+  const waluty = currencies.map((currency) => (
+    <Option value={currency}>{currency}</Option>
+  ));
 
   return (
     <>
@@ -247,7 +265,7 @@ const CurrencyConverter = (props) => {
         <Form.Item
           name="kwota"
           label="Kwota"
-          tooltip="Proszę użyć przecinek np: 123,45"
+          tooltip="Przykład: 100.45"
           rules={[
             {
               required: true,
@@ -266,9 +284,10 @@ const CurrencyConverter = (props) => {
           ]}
         >
           <Select placeholder="Proszę wybrać z listy" allowClear>
-            <Option value="EUR">EUR</Option>
+            {/* <Option value="EUR">EUR</Option>
             <Option value="USD">USD</Option>
-            <Option value="inne">inne</Option>
+            <Option value="inne">inne</Option> */}
+            {waluty}
           </Select>
         </Form.Item>
         <Form.Item
@@ -295,8 +314,8 @@ const CurrencyConverter = (props) => {
         </Form.Item>
         <Form.Item
           name="Data"
-          label="DatePicker"
-          tooltip="Pole puste - oznacza dzisiejszą datę"
+          label="Data"
+          tooltip="Puste pole - oznacza dzisiejszą datę"
           rules={[
             {
               required: false,
@@ -307,7 +326,7 @@ const CurrencyConverter = (props) => {
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
-            Submit
+            Oblicz
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset

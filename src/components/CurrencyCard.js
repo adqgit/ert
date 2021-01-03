@@ -33,26 +33,28 @@ function CurrencyCard({
           <CaretDownOutlined style={{ color: "#eb2f96" }} />
         )}
       </h3>
-      <p>{currency}</p>
-      <section className="last5">
+      <p className=" d-none d-sm-block">{currency}</p>
+      <div className="last5 d-none d-sm-block">Poprzednie dni:</div>
+      <section className="last5 d-none d-sm-block">
         <div>
-          {yesterdayRate} <br />
-          <strong>{yesterdayEffectiveDate}</strong>
+          <strong> {yesterdayEffectiveDate}</strong>
+          <br />
+          {yesterdayRate.toFixed(2)}
         </div>
         <div>
-          {minusTwoDaysRate}
-          <br />
           <strong>{minusTwoDaysEffectiveDate}</strong>
+          <br />
+          {minusTwoDaysRate.toFixed(2)}
         </div>
         <div>
-          {minusThreeDaysRate}
-          <br />
           <strong>{minusThreeDaysEffectiveDate}</strong>
+          <br />
+          {minusThreeDaysRate.toFixed(2)}
         </div>
         <div>
-          {minusFourDaysRate}
-          <br />
           <strong>{minusFourDaysEffectiveDate}</strong>
+          <br />
+          {minusFourDaysRate.toFixed(2)}
         </div>
       </section>
     </div>

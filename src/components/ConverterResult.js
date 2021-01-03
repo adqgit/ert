@@ -28,7 +28,7 @@ const ConverterResult = ({
         Znaleziony kurs:<strong> {rate}</strong>
       </p>
       <p>
-        Wynik kalkulacji: <strong>{calculationResult} PLN</strong>
+        Otrzymana kwota: <strong>{calculationResult} PLN</strong>
       </p>
     </>
   );
