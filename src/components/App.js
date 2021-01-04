@@ -66,7 +66,7 @@ function App() {
       <Layout style={{ minHeight: "100vh" }}>
         <Sider
           collapsible
-          collapsed={!collapsed}
+          collapsed={collapsed}
           onCollapse={() => setCollapsed((prev) => !prev)}
           // collapsedWidth={0}
           zeroWidthTriggerStyle={{
@@ -78,6 +78,7 @@ function App() {
             position: "-webkit-sticky",
           }}
           // style={{ position: "absolute", height: "100vh", "z-index": "200" }}
+          className="d-none d-sm-block"
         >
           <div className="logo">
             <NavLink to="/">
@@ -123,9 +124,39 @@ function App() {
             </Menu.Item> */}
           </Menu>
         </Sider>
-        <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }} />
+        <Layout className="site-layout ">
+          <Header
+            className="site-layout-background d-none d-sm-block"
+            style={{ padding: 0 }}
+          />
           <Content style={{ margin: "0 16px" }}>
+            <div className="logo d-block d-sm-none">
+              <NavLink to="/">
+                <p className="ert">
+                  <BarChartOutlined style={{ fontSize: "60px" }} />
+                  <span>ert</span>
+                </p>
+              </NavLink>
+            </div>
+
+            <Menu
+              theme="dark"
+              mode="horizontal"
+              defaultSelectedKeys={["1"]}
+              className="d-block d-sm-none"
+            >
+              <Menu.Item key="1" icon={<StockOutlined />}>
+                <NavLink exact to="/">
+                  Kursy walut
+                </NavLink>
+              </Menu.Item>
+              <Menu.Item
+                key="2"
+                icon={<BankOutlined style={{ fontSize: "20px" }} />}
+              >
+                <NavLink to="/CurrencyConverter">Kalkulator</NavLink>
+              </Menu.Item>
+            </Menu>
             <Breadcrumb style={{ margin: "16px 0" }}>
               <Breadcrumb.Item>Exchange Rate Table</Breadcrumb.Item>
               {/* <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
@@ -147,7 +178,7 @@ function App() {
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>
-            ERT - Exchange Rate Table / Ant Design ©2020
+            ERT - Exchange Rate Table ©2021
           </Footer>
         </Layout>
       </Layout>

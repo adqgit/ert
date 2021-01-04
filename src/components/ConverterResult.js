@@ -16,7 +16,7 @@ const ConverterResult = ({
 
   function success(copiedText) {
     Modal.success({
-      content: "Skopiowano do schowka: " + copiedText,
+      content: "Skopiowano: " + copiedText,
     });
   }
 
@@ -43,7 +43,7 @@ const ConverterResult = ({
         Znaleziony kurs:<strong> {rate}</strong>
       </p>
       <p>
-        Otrzymana kwota:
+        Otrzymana kwota: &nbsp;
         <strong style={{ cursor: "pointer" }}>
           <Input
             suffix=" PLN"

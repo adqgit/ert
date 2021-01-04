@@ -33,7 +33,7 @@ function Ert({ ert }) {
           </div>
           <div className="col-sm">
             <CurrencyCard
-              cssClass="card card-2"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[7].code}
               currency={ert[4].rates[7].currency}
               actualRate={ert[4].rates[7].mid}
@@ -49,7 +49,7 @@ function Ert({ ert }) {
           </div>
           <div className="col-sm">
             <CurrencyCard
-              cssClass="card card-3"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[10].code}
               currency={ert[4].rates[10].currency}
               actualRate={ert[4].rates[10].mid}
@@ -67,7 +67,7 @@ function Ert({ ert }) {
         <div className="row">
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-1"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[9].code}
               currency={ert[4].rates[9].currency}
               actualRate={ert[4].rates[9].mid}
@@ -83,7 +83,7 @@ function Ert({ ert }) {
           </div>
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-2"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[13].code}
               currency={ert[4].rates[13].currency}
               actualRate={ert[4].rates[13].mid}
@@ -99,7 +99,7 @@ function Ert({ ert }) {
           </div>
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-3"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[17].code}
               currency={ert[4].rates[17].currency}
               actualRate={ert[4].rates[17].mid}
@@ -117,7 +117,7 @@ function Ert({ ert }) {
         <div className="row">
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-1"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[11].code}
               currency={ert[4].rates[11].currency}
               actualRate={ert[4].rates[11].mid}
@@ -133,7 +133,7 @@ function Ert({ ert }) {
           </div>
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-2"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[16].code}
               currency={ert[4].rates[16].currency}
               actualRate={ert[4].rates[16].mid}
@@ -149,7 +149,7 @@ function Ert({ ert }) {
           </div>
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-3"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[12].code}
               currency={ert[4].rates[12].currency}
               actualRate={ert[4].rates[12].mid}
@@ -167,7 +167,7 @@ function Ert({ ert }) {
         <div className="row">
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-1"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[14].code}
               currency={ert[4].rates[14].currency}
               actualRate={ert[4].rates[14].mid}
@@ -183,7 +183,7 @@ function Ert({ ert }) {
           </div>
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-2"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[18].code}
               currency={ert[4].rates[18].currency}
               actualRate={ert[4].rates[18].mid}
@@ -199,7 +199,7 @@ function Ert({ ert }) {
           </div>
           <div class="col-sm">
             <CurrencyCard
-              cssClass="card card-3"
+              cssClass={"card card-" + Math.floor(Math.random() * 3 + 1)}
               code={ert[4].rates[22].code}
               currency={ert[4].rates[22].currency}
               actualRate={ert[4].rates[22].mid}
