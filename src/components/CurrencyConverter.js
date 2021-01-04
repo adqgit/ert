@@ -8,7 +8,7 @@ import moment from "moment";
 const { Option } = Select;
 const layout = {
   labelCol: {
-    span: 4,
+    span: 0,
   },
   wrapperCol: {
     span: 4,
@@ -16,7 +16,7 @@ const layout = {
 };
 const tailLayout = {
   wrapperCol: {
-    offset: 4,
+    offset: 1,
     span: 4,
   },
 };
@@ -261,6 +261,7 @@ const CurrencyConverter = (props) => {
 
   return (
     <>
+      <p>Zamień na PLN według kursu za poprzedni dzień roboczy.</p>
       <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
         <Form.Item
           name="kwota"

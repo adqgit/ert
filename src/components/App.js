@@ -26,6 +26,7 @@ const { SubMenu } = Menu;
 function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [ert, setErt] = useState("", []);
+  const [ratesDate, setRatesDate] = useState("");
 
   // const [value, onChange] = useState(new Date());
 
@@ -45,6 +46,8 @@ function App() {
         .then((response) => response.json())
         .then((data) => {
           setErt(data);
+          console.log(data[4].effectiveDate);
+          setRatesDate(data[4].effectiveDate);
         })
         .catch((error) => console.log(error, "Ooops coś poszło nie tak..."));
 
@@ -96,7 +99,7 @@ function App() {
             >
               <NavLink to="/CurrencyConverter">Kalkulator walutowy</NavLink>
             </Menu.Item>
-            <SubMenu
+            {/* <SubMenu
               key="sub1"
               icon={<DollarOutlined style={{ fontSize: "20px" }} />}
               title="Waluty"
@@ -117,15 +120,15 @@ function App() {
               onClick={() => console.log(ert)}
             >
               Files
-            </Menu.Item>
+            </Menu.Item> */}
           </Menu>
         </Sider>
         <Layout className="site-layout">
           <Header className="site-layout-background" style={{ padding: 0 }} />
           <Content style={{ margin: "0 16px" }}>
             <Breadcrumb style={{ margin: "16px 0" }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
+              <Breadcrumb.Item>Exchange Rate Table</Breadcrumb.Item>
+              {/* <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
             </Breadcrumb>
             <div
               className="site-layout-background"

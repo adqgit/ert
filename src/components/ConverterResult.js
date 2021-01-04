@@ -1,5 +1,7 @@
 import React from "react";
 import "./ConverterResult.css";
+import { Input, Modal } from "antd";
+import useClippy from "use-clippy";
 
 const ConverterResult = ({
   calculatedDate,
@@ -10,6 +12,19 @@ const ConverterResult = ({
   calculationResult,
 }) => {
   console.log(calculatedAmount);
+  const [clipboard, setClipboard] = useClippy();
+
+  function success(copiedText) {
+    Modal.success({
+      content: "Skopiowano do schowka: " + copiedText,
+    });
+  }
+
+  const handleCopyToClipboard = (e) => {
+    setClipboard(e.target.value);
+    success(e.target.value);
+  };
+
   return (
     <>
       <p>
@@ -22,13 +37,22 @@ const ConverterResult = ({
         </strong>
       </p>
       <p>
-        Znaleziona data <strong>{tradingDate}</strong>
+        Znaleziona data: <strong>{tradingDate}</strong>
       </p>
       <p>
         Znaleziony kurs:<strong> {rate}</strong>
       </p>
       <p>
-        Otrzymana kwota: <strong>{calculationResult} PLN</strong>
+        Otrzymana kwota:
+        <strong style={{ cursor: "pointer" }}>
+          <Input
+            suffix=" PLN"
+            value={calculationResult}
+            id="myInput"
+            style={{ width: "120px" }}
+            onClick={handleCopyToClipboard}
+          />
+        </strong>
       </p>
     </>
   );

@@ -1,11 +1,6 @@
 import React from "react";
 import "./Ert.css";
 import CurrencyCard from "./CurrencyCard";
-import {
-  CoffeeOutlined,
-  CaretUpOutlined,
-  CaretDownOutlined,
-} from "@ant-design/icons";
 
 function Ert({ ert }) {
   return (
@@ -16,6 +11,9 @@ function Ert({ ert }) {
         rel="stylesheet"
       />
       <div className="container">
+        <div style={{ textAlign: "center" }}>
+          Średnie kursy NBP z dnia <strong>{ert[4].effectiveDate}</strong>
+        </div>
         <div className="row">
           <div className="col-sm">
             <CurrencyCard
@@ -67,7 +65,7 @@ function Ert({ ert }) {
           </div>
         </div>
         <div className="row">
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-1"
               code={ert[4].rates[9].code}
@@ -83,7 +81,7 @@ function Ert({ ert }) {
               minusFourDaysEffectiveDate={ert[0].effectiveDate.slice(5)}
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-2"
               code={ert[4].rates[13].code}
@@ -99,7 +97,7 @@ function Ert({ ert }) {
               minusFourDaysEffectiveDate={ert[0].effectiveDate.slice(5)}
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-3"
               code={ert[4].rates[17].code}
@@ -117,7 +115,7 @@ function Ert({ ert }) {
           </div>
         </div>
         <div className="row">
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-1"
               code={ert[4].rates[11].code}
@@ -133,7 +131,7 @@ function Ert({ ert }) {
               minusFourDaysEffectiveDate={ert[0].effectiveDate.slice(5)}
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-2"
               code={ert[4].rates[16].code}
@@ -149,7 +147,7 @@ function Ert({ ert }) {
               minusFourDaysEffectiveDate={ert[0].effectiveDate.slice(5)}
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-3"
               code={ert[4].rates[12].code}
@@ -167,7 +165,7 @@ function Ert({ ert }) {
           </div>
         </div>
         <div className="row">
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-1"
               code={ert[4].rates[14].code}
@@ -183,7 +181,7 @@ function Ert({ ert }) {
               minusFourDaysEffectiveDate={ert[0].effectiveDate.slice(5)}
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-2"
               code={ert[4].rates[18].code}
@@ -199,7 +197,7 @@ function Ert({ ert }) {
               minusFourDaysEffectiveDate={ert[0].effectiveDate.slice(5)}
             />
           </div>
-          <div class="col-md-4">
+          <div class="col-sm">
             <CurrencyCard
               cssClass="card card-3"
               code={ert[4].rates[22].code}

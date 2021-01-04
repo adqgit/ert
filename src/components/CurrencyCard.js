@@ -24,7 +24,7 @@ function CurrencyCard({
   return (
     <div className={cssClass}>
       <h3>
-        {code} {actualRate}
+        {code} {actualRate.toFixed(4)}
         {actualRate > yesterdayRate ? (
           <CaretUpOutlined style={{ color: "#52c41a" }} />
         ) : actualRate === yesterdayRate ? (
@@ -34,7 +34,7 @@ function CurrencyCard({
         )}
       </h3>
       <p className=" d-none d-sm-block">{currency}</p>
-      <div className="last5 d-none d-sm-block">Poprzednie dni:</div>
+      <div className="last5 d-none d-sm-block">Poprzednie dni (handlowe):</div>
       <section className="last5 d-none d-sm-block">
         <div>
           <strong> {yesterdayEffectiveDate}</strong>
