@@ -38,7 +38,8 @@ const CurrencyConverter = (props) => {
   const [secondCurrency, setSecondCurrency] = useState("PLN");
   const [amount, setAmount] = useState("");
   const [calculationResult, setCalculationResult] = useState();
-  const [rateResult, setRateResult] = useState();
+  const [rateDate, setRateDate] = useState();
+  const [rate, setRate] = useState();
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD")
   );
@@ -59,6 +60,9 @@ const CurrencyConverter = (props) => {
     let newDate = selectedDate;
     if (amount === "") {
       setCalculationResult("");
+    }
+    if (localStorage.getItem("amount") === undefined) {
+      console.log("hahah");
     }
 
     const fetchNow = () => {
@@ -83,12 +87,17 @@ const CurrencyConverter = (props) => {
             const tempAmount = (amount / data.rates[0].mid).toFixed(2);
 
             setCalculationResult(tempAmount);
-            setRateResult(data.rates[0].effectiveDate);
+            const dateToLocalStorage = data.rates[0].effectiveDate;
+            setRateDate(data.rates[0].effectiveDate);
+            localStorage.setItem("localRateDate", dateToLocalStorage);
+            setRate(data.rates[0].mid.toFixed(2));
+            // localStorage.setItem("localRate", data.rates[0].mid.toFixed(2));
           } else {
             const tempAmount = (amount * data.rates[0].mid).toFixed(2);
 
             setCalculationResult(tempAmount);
-            setRateResult(data.rates[0].effectiveDate);
+            setRateDate(data.rates[0].effectiveDate);
+            setRate(data.rates[0].mid.toFixed(2));
           }
           console.log(data);
         })
@@ -112,18 +121,57 @@ const CurrencyConverter = (props) => {
     return current && current > moment(customDate, "YYYY-MM-DD");
   }
 
-  const activeFirstCurrencies = currencies.map((currency) =>
-    currency === secondCurrency ? (
-      <Option value={currency} key={currency} disabled>
-        {currency}
-      </Option>
-    ) : (
-      <Option value={currency} key={currency}>
-        {currency}
-      </Option>
-    )
-  );
+  // const activeFirstCurrencies = currencies.map((currency) =>
+  //   currency === secondCurrency ? (
+  //     <Option value={currency} key={currency} disabled>
+  //       {currency}
+  //     </Option>
+  //   ) : (
+  //     <Option value={currency} key={currency}>
+  //       {currency}
+  //     </Option>
+  //   )
+  // );
 
+  const activeFirstCurrencies = currencies.map((currency) => {
+    // if (currency === secondCurrency)
+    //   return (
+    //     <Option value={currency} key={currency} disabled>
+    //       {currency}
+    //     </Option>
+    //   );
+    // else
+    //   return (
+    //     <Option value={currency} key={currency}>
+    //       {currency}
+    //     </Option>
+    //   );
+
+    if (currency === secondCurrency)
+      return (
+        <Option value={currency} key={currency} disabled>
+          {currency}
+        </Option>
+      );
+    else if (secondCurrency !== "PLN" && currency === "PLN")
+      return (
+        <Option value={currency} key={currency}>
+          {currency}
+        </Option>
+      );
+    else if (secondCurrency !== "PLN" && currency !== "PLN")
+      return (
+        <Option value={currency} key={currency} disabled>
+          {currency}
+        </Option>
+      );
+    else
+      return (
+        <Option value={currency} key={currency}>
+          {currency}
+        </Option>
+      );
+  });
   const selectFirstCurrencyAfter = (
     <Select
       value={firstCurrency}
@@ -136,15 +184,41 @@ const CurrencyConverter = (props) => {
       + {activeFirstCurrencies}+
     </Select>
   );
-  const activeSecondCurrencies = currencies.map((currency) =>
-    currency === firstCurrency ? (
-      <Option value={currency} disabled>
-        {currency}
-      </Option>
-    ) : (
-      <Option value={currency}>{currency}</Option>
-    )
-  );
+  // const activeSecondCurrencies = currencies.map((currency) =>
+  //   currency === firstCurrency ? (
+  //     <Option value={currency} disabled>
+  //       {currency}
+  //     </Option>
+  //   ) : (
+  //     <Option value={currency}>{currency}</Option>
+  //   )
+  // );
+  const activeSecondCurrencies = currencies.map((currency) => {
+    if (currency === firstCurrency)
+      return (
+        <Option value={currency} key={currency} disabled>
+          {currency}
+        </Option>
+      );
+    else if (firstCurrency !== "PLN" && currency === "PLN")
+      return (
+        <Option value={currency} key={currency}>
+          {currency}
+        </Option>
+      );
+    else if (firstCurrency !== "PLN" && currency !== "PLN")
+      return (
+        <Option value={currency} key={currency} disabled>
+          {currency}
+        </Option>
+      );
+    else
+      return (
+        <Option value={currency} key={currency}>
+          {currency}
+        </Option>
+      );
+  });
   const selectSecondCurrencyAfter = (
     <Select
       value={secondCurrency}
@@ -195,7 +269,8 @@ const CurrencyConverter = (props) => {
     setSelectedDate(moment().format("YYYY-MM-DD"));
     setAmount("");
     setCalculationResult("");
-    setRateResult("");
+    setRateDate("");
+    setRate("");
   };
 
   return (
@@ -233,7 +308,10 @@ const CurrencyConverter = (props) => {
             <Col offset={2}>
               {calculationResult ? (
                 <p>
-                  Według średniego kursu NBP z <strong>{rateResult}</strong>
+                  Według średniego kursu NBP z{" "}
+                  <strong>
+                    {rateDate} ( {rate} )
+                  </strong>
                 </p>
               ) : null}
               {/* <br /> */}
@@ -264,7 +342,7 @@ const CurrencyConverter = (props) => {
                 disabled={calculationResult ? false : true}
                 onClick={handleReset}
               >
-                Reset to default
+                Reset
               </Button>
             </Col>
           </Row>
@@ -309,7 +387,8 @@ const CurrencyConverter = (props) => {
             <Col offset={4}>
               {calculationResult ? (
                 <p>
-                  Kurs NBP z <strong>{rateResult}</strong>
+                  Data: <strong>{rateDate}</strong> Kurs:
+                  <strong> {rate}</strong>
                 </p>
               ) : null}
             </Col>
@@ -329,7 +408,7 @@ const CurrencyConverter = (props) => {
           </Row>
           <br />
           <Row gutter={8}>
-            <Col offset={2}>
+            <Col offset={4}>
               <Button
                 disabled={calculationResult ? false : true}
                 onClick={handleCopyToClipboard}
@@ -342,7 +421,7 @@ const CurrencyConverter = (props) => {
                 disabled={calculationResult ? false : true}
                 onClick={handleReset}
               >
-                Reset to default
+                Reset
               </Button>
             </Col>
           </Row>
