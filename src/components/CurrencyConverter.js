@@ -1,349 +1,353 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./CurrencyConverter.css";
 import ConverterResult from "./ConverterResult";
-import { Form, Input, Button, Select, DatePicker, Modal } from "antd";
+import { Button, Input, Select, DatePicker, Row, Col, Modal } from "antd";
+import { RetweetOutlined } from "@ant-design/icons";
 import moment from "moment";
-// import "moment/locale/pl-pl";
-// import locale from "antd/lib/locale/pl_PL";
+import useClippy from "use-clippy";
+
 const { Option } = Select;
-const layout = {
-  labelCol: {
-    span: 0,
-  },
-  wrapperCol: {
-    span: 4,
-  },
-};
-const tailLayout = {
-  wrapperCol: {
-    offset: 1,
-    span: 4,
-  },
-};
+
+const currencies = [
+  "EUR",
+  "GBP",
+  "USD",
+  "SEK",
+  "AUD",
+  "HUF",
+  "RUB",
+  "NOK",
+  "CZK",
+  "DKK",
+  "CHF",
+  "JPY",
+  "PLN",
+];
+
+// const selectAfter = (
+//   <Select defaultValue=".com" className="select-after">
+//     <Option value=".com">.com</Option>
+//     <Option value=".jp">.jp</Option>
+//     <Option value=".cn">.cn</Option>
+//     <Option value=".org">.org</Option>
+//   </Select>
+// );
 
 const CurrencyConverter = (props) => {
-  const actualDate = new Date()
-    .toISOString()
-    .toLocaleString("pl-pl")
-    .slice(0, 10);
+  const [firstCurrency, setFirstCurrency] = useState("EUR");
+  const [secondCurrency, setSecondCurrency] = useState("PLN");
+  const [amount, setAmount] = useState("");
+  const [calculationResult, setCalculationResult] = useState();
+  const [rateResult, setRateResult] = useState();
+  const [selectedDate, setSelectedDate] = useState(
+    moment().format("YYYY-MM-DD")
+  );
+  const [clipboard, setClipboard] = useClippy();
 
-  let selectedDate = "";
-  let selectedDateMinusOneDay = "";
-  let selectedCurrency = "";
-  let amount = "";
-  const [dataFound, setDateFound] = useState("", []);
-  const [rateFound, setRateFound] = useState("", []);
-  const [calculationResult, setCalculationResult] = useState("", []);
-  const [calculatedAmount, setCalculatedAmount] = useState("", []);
-  const [calculatedCurrency, setCalculatedCurrency] = useState("", []);
-  const [calculatedDate, setCalculatedDay] = useState("", []);
+  const handleCopyToClipboard = () => {
+    setClipboard(calculationResult);
+    success(calculationResult);
+  };
 
-  const currencies = [
-    "EUR",
-    "GBP",
-    "SEK",
-    "AUD",
-    "HUF",
-    "RUB",
-    "NOK",
-    "CZK",
-    "DKK",
-    "CHF",
-    "JPY",
-  ];
-  const [form] = Form.useForm();
-
-  function warningAmount() {
-    Modal.warning({
-      title: "Ooops coś poszło nie tak...",
-      content: "Proszę podać prawidłową kwotę...",
+  function success(copiedText) {
+    Modal.success({
+      content: "Skopiowano: " + copiedText,
     });
   }
 
-  const onFinish = (values) => {
-    if (values.Data === undefined || values.Data > actualDate) {
-      selectedDate = actualDate;
-      console.log("Data pobrana z inputa " + selectedDate);
-      const dateMinusOneDay = moment(selectedDate)
-        .subtract(0, "day")
-        .toISOString()
-        .split("T")[0];
-      selectedDateMinusOneDay = dateMinusOneDay;
-      console.log("data minus 1 dzien: ", selectedDateMinusOneDay);
-      // } else if (values.Data > actualDate) {
-      //   warningDate({ content: "Proszę podać właściwą datę..." });
-      //   console.log(selectedDate);
-    } else {
-      const date = values.Data.toISOString().split("T")[0];
-
-      selectedDate = date;
-      const dateMinusOneDay = moment(date)
-        .subtract(0, "day")
-        .toISOString()
-        .split("T")[0];
-      selectedDateMinusOneDay = dateMinusOneDay;
+  useEffect(() => {
+    let newDate = selectedDate;
+    if (amount === "") {
+      setCalculationResult("");
     }
-    if (
-      !!values.kwota.match(
-        /^[0-9]+(\.[0-9]{1,2})?$/
-        // /(?=.)^\$?(([1-9][0-9]{0,20}(,[0-9]{3})*)|0)?(.[0-9]{1,2})?$/
-      )
-    ) {
-      amount = values.kwota;
-    } else {
-      warningAmount();
-    }
-    selectedCurrency = values.waluta;
 
-    if (amount) {
-      const url = `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${selectedDateMinusOneDay}/?format=json`;
+    const fetchNow = () => {
+      newDate = moment(newDate).subtract(1, "days").format("YYYY-MM-DD");
+      const url = `https://api.nbp.pl/api/exchangerates/rates/a/${
+        firstCurrency === "PLN" ? secondCurrency : firstCurrency
+      }/${newDate}/?format=json`;
+
       fetch(url)
         .then((response) => {
-          console.log(
-            "sprawdzamy pierwszy fetch data to" + selectedDateMinusOneDay
-          );
           if (response.ok) {
             return response;
+          } else if (response.status === 404) {
+            return Promise.reject("404");
+          } else {
+            return Promise.reject("some other error: " + response.status);
           }
-          throw Error(response.statusText);
         })
         .then((response) => response.json())
         .then((data) => {
+          if (firstCurrency === "PLN") {
+            const tempAmount = (amount / data.rates[0].mid).toFixed(2);
+
+            setCalculationResult(tempAmount);
+            setRateResult(data.rates[0].effectiveDate);
+          } else {
+            const tempAmount = (amount * data.rates[0].mid).toFixed(2);
+
+            setCalculationResult(tempAmount);
+            setRateResult(data.rates[0].effectiveDate);
+          }
           console.log(data);
-          setDateFound(data.rates[0].effectiveDate);
-          setRateFound(data.rates[0].mid);
-          setCalculationResult((amount * data.rates[0].mid).toFixed(2));
-          setCalculatedAmount(amount);
-          setCalculatedCurrency(selectedCurrency);
-          setCalculatedDay(selectedDate);
-
-          // debugger;
         })
-        .catch((status) => {
-          console.log("taki blad ", status);
-          const dateMinusTwoDays = moment(selectedDateMinusOneDay)
-            .subtract(0, "day")
-            .toISOString()
-            .split("T")[0];
 
-          console.log("Nowa data to: ", dateMinusTwoDays);
-
-          fetch(
-            `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusTwoDays}/?format=json`
-          )
-            .then((response) => {
-              if (response.ok) {
-                return response;
-              }
-              throw Error(response.statusText);
-            })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data);
-              setDateFound(data.rates[0].effectiveDate);
-              setRateFound(data.rates[0].mid);
-              console.log(data.rates[0].effectiveDate, data.rates[0].mid);
-              setCalculationResult((amount * data.rates[0].mid).toFixed(2));
-              setCalculatedAmount(amount);
-              setCalculatedCurrency(selectedCurrency);
-              setCalculatedDay(selectedDate);
-            })
-            .catch(() => {
-              const dateMinusThreeDays = moment(dateMinusTwoDays)
-                .subtract(0, "day")
-                .toISOString()
-                .split("T")[0];
-
-              console.log("Nowa data to: ", dateMinusThreeDays);
-
-              fetch(
-                `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusThreeDays}/?format=json`
-              )
-                .then((response) => {
-                  if (response.ok) {
-                    return response;
-                  }
-                  throw Error(response.statusText);
-                })
-                .then((response) => response.json())
-                .then((data) => {
-                  console.log(data);
-                  setDateFound(data.rates[0].effectiveDate);
-                  setRateFound(data.rates[0].mid);
-                  console.log(data.rates[0].effectiveDate, data.rates[0].mid);
-                  setCalculationResult((amount * data.rates[0].mid).toFixed(2));
-                  setCalculatedAmount(amount);
-                  setCalculatedCurrency(selectedCurrency);
-                  setCalculatedDay(selectedDate);
-                })
-                .catch(() => {
-                  const dateMinusFourDays = moment(dateMinusThreeDays)
-                    .subtract(0, "day")
-                    .toISOString()
-                    .split("T")[0];
-
-                  console.log("Nowa data to: ", dateMinusFourDays);
-
-                  fetch(
-                    `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusFourDays}/?format=json`
-                  )
-                    .then((response) => {
-                      if (response.ok) {
-                        return response;
-                      }
-                      throw Error(response.statusText);
-                    })
-                    .then((response) => response.json())
-                    .then((data) => {
-                      console.log(data);
-                      setDateFound(data.rates[0].effectiveDate);
-                      setRateFound(data.rates[0].mid);
-                      setCalculationResult(
-                        (amount * data.rates[0].mid).toFixed(2)
-                      );
-                      setCalculatedAmount(amount);
-                      setCalculatedCurrency(selectedCurrency);
-                      setCalculatedDay(selectedDate);
-                      console.log(
-                        data.rates[0].effectiveDate,
-                        data.rates[0].mid
-                      );
-                    })
-                    .catch(() => {
-                      const dateMinusFiveDays = moment(dateMinusFourDays)
-                        .subtract(0, "day")
-                        .toISOString()
-                        .split("T")[0];
-
-                      console.log("Nowa data to: ", dateMinusFiveDays);
-
-                      fetch(
-                        `https://api.nbp.pl/api/exchangerates/rates/a/${selectedCurrency}/${dateMinusFiveDays}/?format=json`
-                      )
-                        .then((response) => {
-                          if (response.ok) {
-                            return response;
-                          }
-                          throw Error(response.statusText);
-                        })
-                        .then((response) => response.json())
-                        .then((data) => {
-                          console.log(data);
-                          setDateFound(data.rates[0].effectiveDate);
-                          setRateFound(data.rates[0].mid);
-                          setCalculationResult(
-                            (amount * data.rates[0].mid).toFixed(2)
-                          );
-                          setCalculatedAmount(amount);
-                          setCalculatedCurrency(selectedCurrency);
-                          setCalculatedDay(selectedDate);
-                          console.log(
-                            data.rates[0].effectiveDate,
-                            data.rates[0].mid
-                          );
-                        })
-                        .catch((error) => console.log(error));
-                    });
-                });
-            });
+        .catch((error) => {
+          if (error === "404") {
+            fetchNow();
+          } else {
+            console.log("jakis inny blad");
+          }
         });
+    };
+    if (amount !== "") {
+      fetchNow();
+    }
+    // debugger;
+  }, [firstCurrency, secondCurrency, amount, selectedDate]);
+
+  function disabledDates(current) {
+    let customDate = moment();
+    return current && current > moment(customDate, "YYYY-MM-DD");
+  }
+
+  const activeFirstCurrencies = currencies.map((currency) =>
+    currency === secondCurrency ? (
+      <Option value={currency} key={currency} disabled>
+        {currency}
+      </Option>
+    ) : (
+      <Option value={currency} key={currency}>
+        {currency}
+      </Option>
+    )
+  );
+
+  const selectFirstCurrencyAfter = (
+    <Select
+      value={firstCurrency}
+      className="select-after"
+      onChange={(data) => {
+        setFirstCurrency(data);
+      }}
+    >
+      {" "}
+      + {activeFirstCurrencies}+
+    </Select>
+  );
+  const activeSecondCurrencies = currencies.map((currency) =>
+    currency === firstCurrency ? (
+      <Option value={currency} disabled>
+        {currency}
+      </Option>
+    ) : (
+      <Option value={currency}>{currency}</Option>
+    )
+  );
+  const selectSecondCurrencyAfter = (
+    <Select
+      value={secondCurrency}
+      defaultValue={secondCurrency}
+      className="select-after"
+      onChange={(data) => {
+        setSecondCurrency(data);
+      }}
+    >
+      {" "}
+      + {activeSecondCurrencies}+
+    </Select>
+  );
+
+  const toggleCurrencies = () => {
+    const tempFirstCurrency = firstCurrency;
+    const tempSecondCurrency = secondCurrency;
+    setFirstCurrency(tempSecondCurrency);
+    setSecondCurrency(tempFirstCurrency);
+  };
+
+  function onDateChange(date, dateString) {
+    setSelectedDate(dateString);
+  }
+
+  const handleAmountChange = (e) => {
+    const inputValue = e.target.value;
+    // setAmount(inputValue);
+
+    if (
+      !!inputValue.match(/^[0-9]+(\.[0-9]{1,2})?$/) ||
+      !!inputValue.match(/^[0-9]+(\.)?$/) ||
+      inputValue === ""
+    ) {
+      if (inputValue.isNaN) {
+        console.log("Input jest NaN");
+      } else {
+        setAmount(inputValue);
+      }
+    } else {
+      console.log("Wartość nieprawidłowa");
     }
   };
 
-  const onReset = () => {
-    form.resetFields();
+  const handleReset = () => {
+    setFirstCurrency("EUR");
+    setSecondCurrency("PLN");
+    setSelectedDate(moment().format("YYYY-MM-DD"));
+    setAmount("");
     setCalculationResult("");
+    setRateResult("");
   };
-
-  const waluty = currencies.map((currency) => (
-    <Option value={currency}>{currency}</Option>
-  ));
 
   return (
     <>
-      <p>Zamień na PLN według kursu za poprzedni dzień roboczy.</p>
-      <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-        <Form.Item
-          name="kwota"
-          label="Kwota"
-          tooltip="Przykład: 100.45"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="waluta"
-          label="Waluta"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select placeholder="Proszę wybrać z listy" allowClear>
-            {/* <Option value="EUR">EUR</Option>
-            <Option value="USD">USD</Option>
-            <Option value="inne">inne</Option> */}
-            {waluty}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          noStyle
-          shouldUpdate={(prevValues, currentValues) =>
-            prevValues.waluta !== currentValues.waluta
-          }
-        >
-          {({ getFieldValue }) => {
-            return getFieldValue("waluta") === "inne" ? (
-              <Form.Item
-                name="dodatkoweWaluty"
-                label="Dodatkowe waluty"
-                rules={[
-                  {
-                    required: true,
-                  },
-                ]}
+      <div className="site-input-group-wrapper d-none d-sm-block d-sm-none d-md-block d-md-none d-lg-block">
+        <Input.Group size="medium">
+          <Row gutter={8}>
+            <Col span={4}>
+              <Input
+                addonAfter={selectFirstCurrencyAfter}
+                placeholder="Podaj kwotę..."
+                onChange={handleAmountChange}
+                value={amount}
+              />
+            </Col>
+            <Col>
+              <Button onClick={toggleCurrencies}>
+                <RetweetOutlined
+                  style={{ fontSize: "20px", color: "#1890ff" }}
+                />
+              </Button>
+            </Col>
+
+            <Col span={4}>
+              <Input
+                disabled
+                addonAfter={selectSecondCurrencyAfter}
+                defaultValue="Wynik kalkulacji..."
+                value={calculationResult}
+              />
+            </Col>
+          </Row>
+          <br />
+          <Row>
+            <Col offset={2}>
+              {calculationResult ? (
+                <p>
+                  Według średniego kursu NBP z <strong>{rateResult}</strong>
+                </p>
+              ) : null}
+              {/* <br /> */}
+            </Col>
+          </Row>
+          <Row gutter={8}>
+            <Col offset={1}>
+              <DatePicker
+                defaultValue={moment()}
+                // defaultValue={selectedDate}
+                format="YYYY-MM-DD"
+                disabledDate={disabledDates}
+                onChange={onDateChange}
+                inputReadOnly={true}
+                locale="pl"
+              />
+            </Col>
+            <Col>
+              <Button
+                disabled={calculationResult ? false : true}
+                onClick={handleCopyToClipboard}
               >
-                <Input />
-              </Form.Item>
-            ) : null;
-          }}
-        </Form.Item>
-        <Form.Item
-          name="Data"
-          label="Data"
-          tooltip="Puste pole - oznacza dzisiejszą datę"
-          rules={[
-            {
-              required: false,
-            },
-          ]}
-        >
-          <DatePicker />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
-            Oblicz
-          </Button>
-          <Button htmlType="button" onClick={onReset}>
-            Reset
-          </Button>
-        </Form.Item>
-      </Form>
-      {calculationResult !== "" ? (
-        <ConverterResult
-          calculatedDate={calculatedDate}
-          calculatedCurrency={calculatedCurrency}
-          calculatedAmount={calculatedAmount}
-          tradingDate={dataFound}
-          rate={rateFound}
-          calculationResult={calculationResult}
-        />
-      ) : null}
+                Kopiuj
+              </Button>
+            </Col>
+            <Col>
+              <Button
+                disabled={calculationResult ? false : true}
+                onClick={handleReset}
+              >
+                Reset to default
+              </Button>
+            </Col>
+          </Row>
+        </Input.Group>
+        <br />
+      </div>
+      <div className="site-input-group-wrapper d-block d-sm-block d-md-block d-lg-none">
+        <Input.Group size="medium">
+          <Row>
+            <Col>
+              <Input
+                addonAfter={selectFirstCurrencyAfter}
+                placeholder="Podaj kwotę..."
+                onChange={handleAmountChange}
+                value={amount}
+              />
+            </Col>
+          </Row>
+          <br />
+          <Row>
+            <Col offset={8}>
+              <Button onClick={toggleCurrencies}>
+                <RetweetOutlined
+                  style={{ fontSize: "20px", color: "#1890ff" }}
+                />
+              </Button>
+            </Col>
+          </Row>
+          <br />
+          <Row>
+            <Col>
+              <Input
+                disabled
+                addonAfter={selectSecondCurrencyAfter}
+                defaultValue="Wynik kalkulacji..."
+                value={calculationResult}
+              />
+            </Col>
+          </Row>
+          <br />
+          <Row>
+            <Col offset={4}>
+              {calculationResult ? (
+                <p>
+                  Kurs NBP z <strong>{rateResult}</strong>
+                </p>
+              ) : null}
+            </Col>
+          </Row>
+          <Row>
+            <Col offset={4}>
+              <DatePicker
+                defaultValue={moment()}
+                // defaultValue={selectedDate}
+                format="YYYY-MM-DD"
+                disabledDate={disabledDates}
+                onChange={onDateChange}
+                inputReadOnly={true}
+                locale="pl"
+              />
+            </Col>
+          </Row>
+          <br />
+          <Row gutter={8}>
+            <Col offset={2}>
+              <Button
+                disabled={calculationResult ? false : true}
+                onClick={handleCopyToClipboard}
+              >
+                Kopiuj
+              </Button>
+            </Col>
+            <Col>
+              <Button
+                disabled={calculationResult ? false : true}
+                onClick={handleReset}
+              >
+                Reset to default
+              </Button>
+            </Col>
+          </Row>
+        </Input.Group>
+      </div>
     </>
   );
 };
