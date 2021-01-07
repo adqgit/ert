@@ -18,7 +18,6 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 import CurrencyConverter from "./CurrencyConverter";
 import Ert from "./Ert";
-import EUR from "./EUR";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -100,6 +99,7 @@ function App() {
             >
               <NavLink to="/CurrencyConverter">Kalkulator walutowy</NavLink>
             </Menu.Item>
+
             {/* <SubMenu
               key="sub1"
               icon={<DollarOutlined style={{ fontSize: "20px" }} />}
@@ -157,6 +157,7 @@ function App() {
                 <NavLink to="/CurrencyConverter">Kalkulator</NavLink>
               </Menu.Item>
             </Menu>
+
             <Breadcrumb style={{ margin: "16px 0" }}>
               <Breadcrumb.Item>Exchange Rate Table</Breadcrumb.Item>
               {/* <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
@@ -174,7 +175,7 @@ function App() {
                 path="/CurrencyConverter"
                 render={() => <CurrencyConverter ert={ert} />}
               />
-              <Route path="/EUR" component={EUR} />
+              <Route path="/History" component={History} />
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>

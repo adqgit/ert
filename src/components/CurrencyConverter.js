@@ -10,12 +10,16 @@ import {
   Col,
   Modal,
   Divider,
+  Collapse,
 } from "antd";
+
 import { RetweetOutlined } from "@ant-design/icons";
 import moment from "moment";
 import useClippy from "use-clippy";
+import History from "./History";
 
 const { Option } = Select;
+const { Panel } = Collapse;
 
 const currencies = [
   "EUR",
@@ -33,14 +37,9 @@ const currencies = [
   "PLN",
 ];
 
-// const selectAfter = (
-//   <Select defaultValue=".com" className="select-after">
-//     <Option value=".com">.com</Option>
-//     <Option value=".jp">.jp</Option>
-//     <Option value=".cn">.cn</Option>
-//     <Option value=".org">.org</Option>
-//   </Select>
-// );
+function callback(key) {
+  console.log(key);
+}
 
 const CurrencyConverter = (props) => {
   const [firstCurrency, setFirstCurrency] = useState("EUR");
@@ -53,16 +52,22 @@ const CurrencyConverter = (props) => {
     moment().format("YYYY-MM-DD")
   );
   const [clipboard, setClipboard] = useClippy();
+  const [clearHistory, setClearHistory] = useState(false);
+  const localSt = localStorage.getItem("saved")
+    ? JSON.parse(localStorage.getItem("saved"))
+    : [];
 
   const handleCopyToClipboard = () => {
     setClipboard(calculationResult);
     success(calculationResult);
+    loacalStorageSet();
   };
 
   const handleCopyToClipboardComa = () => {
     const calculationResultComa = calculationResult.replace(".", ",");
     setClipboard(calculationResultComa);
     success(calculationResultComa);
+    loacalStorageSet();
   };
 
   function success(copiedText) {
@@ -70,7 +75,18 @@ const CurrencyConverter = (props) => {
       content: "Skopiowano: " + copiedText,
     });
   }
-
+  const loacalStorageSet = () => {
+    const line = {
+      amount: amount,
+      firstCurrency: firstCurrency,
+      secondCurrency: secondCurrency,
+      selectedDate: rateDate,
+      calculationResult: calculationResult,
+      rate: rate,
+    };
+    localSt.push(line);
+    localStorage.setItem("saved", JSON.stringify(localSt));
+  };
   useEffect(() => {
     let newDate = selectedDate;
     if (amount === "") {
@@ -100,19 +116,21 @@ const CurrencyConverter = (props) => {
         .then((data) => {
           if (firstCurrency === "PLN") {
             const tempAmount = (amount / data.rates[0].mid).toFixed(2);
-
-            setCalculationResult(tempAmount);
-            const dateToLocalStorage = data.rates[0].effectiveDate;
-            setRateDate(data.rates[0].effectiveDate);
-            localStorage.setItem("localRateDate", dateToLocalStorage);
-            setRate(data.rates[0].mid.toFixed(2));
-            // localStorage.setItem("localRate", data.rates[0].mid.toFixed(2));
+            if (!isNaN(tempAmount)) {
+              setCalculationResult(tempAmount);
+              // const dateToLocalStorage = data.rates[0].effectiveDate;
+              setRateDate(data.rates[0].effectiveDate);
+              // localStorage.setItem("localRateDate", dateToLocalStorage);
+              setRate(data.rates[0].mid.toFixed(2));
+              // localStorage.setItem("localRate", data.rates[0].mid.toFixed(2));
+            }
           } else {
             const tempAmount = (amount * data.rates[0].mid).toFixed(2);
-
-            setCalculationResult(tempAmount);
-            setRateDate(data.rates[0].effectiveDate);
-            setRate(data.rates[0].mid.toFixed(2));
+            if (!isNaN(tempAmount)) {
+              setCalculationResult(tempAmount);
+              setRateDate(data.rates[0].effectiveDate);
+              setRate(data.rates[0].mid.toFixed(2));
+            }
           }
           console.log(data);
         })
@@ -371,6 +389,30 @@ const CurrencyConverter = (props) => {
               >
                 Kopiuj z przecinkiem
               </Button>
+            </Col>
+          </Row>
+          <Divider orientation="center">Historia</Divider>
+          <Row gutter={8} justify={"center"}>
+            <Col>
+              <Collapse accordion onChange={callback}>
+                <Panel header="Pokaż / Ukryj" key="1">
+                  <History localSt={localSt} />
+                  <Divider orientation="center">Wyczyść Historię</Divider>
+                  <Row justify={"center"}>
+                    <Button
+                      // justify={"center"}
+                      // disabled={localSt ? false : true}
+                      onClick={() => {
+                        localStorage.clear();
+                        localSt.splice(0);
+                        setClearHistory((prev) => !prev);
+                      }}
+                    >
+                      Wyczyść Historię
+                    </Button>
+                  </Row>
+                </Panel>
+              </Collapse>
             </Col>
           </Row>
           <Divider orientation="center">Resetuj</Divider>
