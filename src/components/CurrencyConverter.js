@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./CurrencyConverter.css";
 import ConverterResult from "./ConverterResult";
-import { Button, Input, Select, DatePicker, Row, Col, Modal } from "antd";
+import {
+  Button,
+  Input,
+  Select,
+  DatePicker,
+  Row,
+  Col,
+  Modal,
+  Divider,
+} from "antd";
 import { RetweetOutlined } from "@ant-design/icons";
 import moment from "moment";
 import useClippy from "use-clippy";
@@ -48,6 +57,12 @@ const CurrencyConverter = (props) => {
   const handleCopyToClipboard = () => {
     setClipboard(calculationResult);
     success(calculationResult);
+  };
+
+  const handleCopyToClipboardComa = () => {
+    const calculationResultComa = calculationResult.replace(".", ",");
+    setClipboard(calculationResultComa);
+    success(calculationResultComa);
   };
 
   function success(copiedText) {
@@ -249,12 +264,20 @@ const CurrencyConverter = (props) => {
     // setAmount(inputValue);
 
     if (
-      !!inputValue.match(/^[0-9]+(\.[0-9]{1,2})?$/) ||
-      !!inputValue.match(/^[0-9]+(\.)?$/) ||
+      // !!inputValue.match(/^[0-9]+(\.|,[0-9]{1,2})?$/) ||
+      // !!inputValue.match(/^[0-9]+(\.|,)?$/) ||
+      !!inputValue.match(/^[0-9]+((\.[0-9]{1,2})|(,[0-9]{1,2}))?$/) ||
+      !!inputValue.match(/^[0-9]+((\.)|(,))?$/) ||
       inputValue === ""
     ) {
-      if (inputValue.isNaN) {
-        console.log("Input jest NaN");
+      if (
+        inputValue.includes(",") &&
+        !!inputValue.match(/^[0-9]+((\.[0-9]{1,2})|(\,[0-9]{1,2}))?$/)
+      ) {
+        const newValue = inputValue.replace(/,/g, ".");
+        parseFloat(newValue);
+
+        setAmount(newValue);
       } else {
         setAmount(inputValue);
       }
@@ -277,8 +300,8 @@ const CurrencyConverter = (props) => {
     <>
       <div className="site-input-group-wrapper d-none d-sm-block d-sm-none d-md-block d-md-none d-lg-block">
         <Input.Group size="medium">
-          <Row gutter={8}>
-            <Col span={4}>
+          <Row gutter={8} justify={"center"}>
+            <Col>
               <Input
                 addonAfter={selectFirstCurrencyAfter}
                 placeholder="Podaj kwotę..."
@@ -294,7 +317,7 @@ const CurrencyConverter = (props) => {
               </Button>
             </Col>
 
-            <Col span={4}>
+            <Col>
               <Input
                 disabled
                 addonAfter={selectSecondCurrencyAfter}
@@ -304,8 +327,8 @@ const CurrencyConverter = (props) => {
             </Col>
           </Row>
           <br />
-          <Row>
-            <Col offset={2}>
+          <Row justify={"center"}>
+            <Col>
               {calculationResult ? (
                 <p>
                   Według średniego kursu NBP z{" "}
@@ -317,8 +340,9 @@ const CurrencyConverter = (props) => {
               {/* <br /> */}
             </Col>
           </Row>
-          <Row gutter={8}>
-            <Col offset={1}>
+          <Divider orientation="center">Wybierz datę</Divider>
+          <Row gutter={8} justify={"center"}>
+            <Col>
               <DatePicker
                 defaultValue={moment()}
                 // defaultValue={selectedDate}
@@ -329,14 +353,28 @@ const CurrencyConverter = (props) => {
                 locale="pl"
               />
             </Col>
+          </Row>
+          <Divider orientation="center">Kopiuj do schowka</Divider>
+          <Row gutter={8} justify={"center"}>
             <Col>
               <Button
                 disabled={calculationResult ? false : true}
                 onClick={handleCopyToClipboard}
               >
-                Kopiuj
+                Kopiuj z kropką
               </Button>
             </Col>
+            <Col>
+              <Button
+                disabled={calculationResult ? false : true}
+                onClick={handleCopyToClipboardComa}
+              >
+                Kopiuj z przecinkiem
+              </Button>
+            </Col>
+          </Row>
+          <Divider orientation="center">Resetuj</Divider>
+          <Row justify={"center"}>
             <Col>
               <Button
                 disabled={calculationResult ? false : true}
@@ -362,8 +400,8 @@ const CurrencyConverter = (props) => {
             </Col>
           </Row>
           <br />
-          <Row>
-            <Col offset={8}>
+          <Row justify={"center"}>
+            <Col>
               <Button onClick={toggleCurrencies}>
                 <RetweetOutlined
                   style={{ fontSize: "20px", color: "#1890ff" }}
@@ -393,8 +431,9 @@ const CurrencyConverter = (props) => {
               ) : null}
             </Col>
           </Row>
-          <Row>
-            <Col offset={4}>
+          <Divider orientation="center">Wybierz datę</Divider>
+          <Row justify={"center"}>
+            <Col>
               <DatePicker
                 defaultValue={moment()}
                 // defaultValue={selectedDate}
@@ -406,16 +445,32 @@ const CurrencyConverter = (props) => {
               />
             </Col>
           </Row>
-          <br />
-          <Row gutter={8}>
-            <Col offset={4}>
+          <Divider orientation="center">Kopiuj do schowka</Divider>
+          <Row gutter={8} justify={"center"}>
+            <Col>
               <Button
+                // style={{ textAlign: "center", width: "100%" }}
                 disabled={calculationResult ? false : true}
                 onClick={handleCopyToClipboard}
+                // flex={auto}
               >
-                Kopiuj
+                Kopiuj z kropką
               </Button>
             </Col>
+          </Row>
+          <br />
+          <Row justify={"center"}>
+            <Col>
+              <Button
+                disabled={calculationResult ? false : true}
+                onClick={handleCopyToClipboardComa}
+              >
+                Kopiuj z przecinkiem
+              </Button>
+            </Col>
+          </Row>
+          <Divider orientation="center">Resetuj</Divider>
+          <Row gutter={8} justify={"center"}>
             <Col>
               <Button
                 disabled={calculationResult ? false : true}
