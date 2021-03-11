@@ -90,14 +90,14 @@ function App() {
           <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
             <Menu.Item key="1" icon={<StockOutlined />}>
               <NavLink exact to="/">
-                Kursy walut
+                Kalkulator walutowy
               </NavLink>
             </Menu.Item>
             <Menu.Item
               key="2"
               icon={<BankOutlined style={{ fontSize: "20px" }} />}
             >
-              <NavLink to="/CurrencyConverter">Kalkulator walutowy</NavLink>
+              <NavLink to="/Rates">Kursy walut</NavLink>
             </Menu.Item>
 
             {/* <SubMenu
@@ -147,14 +147,14 @@ function App() {
             >
               <Menu.Item key="1" icon={<StockOutlined />}>
                 <NavLink exact to="/">
-                  Kursy walut
+                  Kalkulator walutowy
                 </NavLink>
               </Menu.Item>
               <Menu.Item
                 key="2"
                 icon={<BankOutlined style={{ fontSize: "20px" }} />}
               >
-                <NavLink to="/CurrencyConverter">Kalkulator</NavLink>
+                <NavLink to="/Rates">Kursy walut</NavLink>
               </Menu.Item>
             </Menu>
 
@@ -169,12 +169,13 @@ function App() {
               {ert === "" ? (
                 <LoadingOutlined style={{ fontSize: 24 }} spin />
               ) : (
-                <Route exact path="/" render={() => <Ert ert={ert} />} />
+                <Route
+                  exact
+                  path="/"
+                  render={() => <CurrencyConverter ert={ert} />}
+                />
               )}
-              <Route
-                path="/CurrencyConverter"
-                render={() => <CurrencyConverter ert={ert} />}
-              />
+              <Route path="/Rates" render={() => <Ert ert={ert} />} />
               <Route path="/History" component={History} />
             </div>
           </Content>

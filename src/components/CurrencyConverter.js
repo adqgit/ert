@@ -58,16 +58,26 @@ const CurrencyConverter = (props) => {
     : [];
 
   const handleCopyToClipboard = () => {
-    setClipboard(calculationResult);
-    success(calculationResult);
+    setClipboard(Number(calculationResult).toFixed(2));
+    success(Number(calculationResult).toFixed(2));
     loacalStorageSet();
+    if (clearHistory === true) {
+      setClearHistory(false);
+    }
   };
 
   const handleCopyToClipboardComa = () => {
-    const calculationResultComa = calculationResult.replace(".", ",");
+    const resultNumber = Number(calculationResult);
+    const resultFixed = resultNumber.toFixed(2);
+
+    const calculationResultComa = resultFixed.replace(".", ",");
+
     setClipboard(calculationResultComa);
     success(calculationResultComa);
-    loacalStorageSet();
+    loacalStorageSet(calculationResultComa);
+    if (clearHistory === true) {
+      setClearHistory(false);
+    }
   };
 
   function success(copiedText) {
@@ -75,13 +85,17 @@ const CurrencyConverter = (props) => {
       content: "Skopiowano: " + copiedText,
     });
   }
-  const loacalStorageSet = () => {
+  const loacalStorageSet = (calculationResultComa) => {
+    if (calculationResultComa) {
+    }
     const line = {
       amount: amount,
       firstCurrency: firstCurrency,
       secondCurrency: secondCurrency,
       selectedDate: rateDate,
-      calculationResult: calculationResult,
+      calculationResult: calculationResultComa
+        ? calculationResultComa
+        : Number(calculationResult).toFixed(2),
       rate: rate,
     };
     localSt.push(line);
@@ -115,21 +129,21 @@ const CurrencyConverter = (props) => {
         .then((response) => response.json())
         .then((data) => {
           if (firstCurrency === "PLN") {
-            const tempAmount = (amount / data.rates[0].mid).toFixed(2);
+            const tempAmount = amount / data.rates[0].mid;
             if (!isNaN(tempAmount)) {
-              setCalculationResult(tempAmount);
+              setCalculationResult(tempAmount + "");
               // const dateToLocalStorage = data.rates[0].effectiveDate;
               setRateDate(data.rates[0].effectiveDate);
               // localStorage.setItem("localRateDate", dateToLocalStorage);
-              setRate(data.rates[0].mid.toFixed(2));
+              setRate(data.rates[0].mid);
               // localStorage.setItem("localRate", data.rates[0].mid.toFixed(2));
             }
           } else {
-            const tempAmount = (amount * data.rates[0].mid).toFixed(2);
+            const tempAmount = amount * data.rates[0].mid;
             if (!isNaN(tempAmount)) {
-              setCalculationResult(tempAmount);
+              setCalculationResult(tempAmount + "");
               setRateDate(data.rates[0].effectiveDate);
-              setRate(data.rates[0].mid.toFixed(2));
+              setRate(data.rates[0].mid);
             }
           }
           console.log(data);
@@ -340,7 +354,11 @@ const CurrencyConverter = (props) => {
                 disabled
                 addonAfter={selectSecondCurrencyAfter}
                 defaultValue="Wynik kalkulacji..."
-                value={calculationResult}
+                value={
+                  calculationResult === ""
+                    ? ""
+                    : Number(calculationResult).toFixed(2)
+                }
               />
             </Col>
           </Row>
@@ -391,30 +409,34 @@ const CurrencyConverter = (props) => {
               </Button>
             </Col>
           </Row>
-          <Divider orientation="center">Historia</Divider>
-          <Row gutter={8} justify={"center"}>
-            <Col>
-              <Collapse accordion onChange={callback}>
-                <Panel header="Pokaż / Ukryj" key="1">
-                  <History localSt={localSt} />
-                  <Divider orientation="center">Wyczyść Historię</Divider>
-                  <Row justify={"center"}>
-                    <Button
-                      // justify={"center"}
-                      // disabled={localSt ? false : true}
-                      onClick={() => {
-                        localStorage.clear();
-                        localSt.splice(0);
-                        setClearHistory((prev) => !prev);
-                      }}
-                    >
-                      Wyczyść Historię
-                    </Button>
-                  </Row>
-                </Panel>
-              </Collapse>
-            </Col>
-          </Row>
+
+          {clearHistory !== true ? (
+            <Row gutter={8} justify={"center"}>
+              <Divider orientation="center">Historia</Divider>
+              <Col>
+                <Collapse accordion onChange={callback}>
+                  <Panel header="Pokaż / Ukryj" key="1">
+                    <History localSt={localSt} />
+                    <Divider orientation="center">Wyczyść Historię</Divider>
+                    <Row justify={"center"}>
+                      <Button
+                        // justify={"center"}
+                        // disabled={localSt ? false : true}
+                        onClick={() => {
+                          localStorage.clear();
+                          localSt.splice(0);
+                          setClearHistory((prev) => !prev);
+                        }}
+                      >
+                        Wyczyść Historię
+                      </Button>
+                    </Row>
+                  </Panel>
+                </Collapse>
+              </Col>
+            </Row>
+          ) : null}
+
           <Divider orientation="center">Resetuj</Divider>
           <Row justify={"center"}>
             <Col>
@@ -458,7 +480,11 @@ const CurrencyConverter = (props) => {
                 disabled
                 addonAfter={selectSecondCurrencyAfter}
                 defaultValue="Wynik kalkulacji..."
-                value={calculationResult}
+                value={
+                  calculationResult === ""
+                    ? ""
+                    : Number(calculationResult).toFixed(2)
+                }
               />
             </Col>
           </Row>
